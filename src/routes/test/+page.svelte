@@ -103,13 +103,13 @@
 
 		const answerCounts = {
 			Visual: 0,
-			Auditory: 0,
+			Auditori: 0,
 			Kinestetik: 0
 		};
 
 		const totalPerType = {
 			Visual: questions.filter((q) => q.type === 'Visual').length,
-			Auditory: questions.filter((q) => q.type === 'Auditory').length,
+			Auditori: questions.filter((q) => q.type === 'Auditori').length,
 			Kinestetik: questions.filter((q) => q.type === 'Kinestetik').length
 		};
 
@@ -130,10 +130,10 @@
 			};
 		});
 
-		const totalScore = answerCounts.Visual + answerCounts.Auditory + answerCounts.Kinestetik;
+		const totalScore = answerCounts.Visual + answerCounts.Auditori + answerCounts.Kinestetik;
 
 		const visualPercentage = Math.round((answerCounts.Visual / totalScore) * 100);
-		const auditoryPercentage = Math.round((answerCounts.Auditory / totalScore) * 100);
+		const auditoryPercentage = Math.round((answerCounts.Auditori / totalScore) * 100);
 		const kinestheticPercentage = 100 - visualPercentage - auditoryPercentage;
 
 		const allPercentages = [
@@ -152,7 +152,7 @@
 			answers: combinedAnswers,
 			result: {
 				visual: answerCounts.Visual,
-				auditory: answerCounts.Auditory,
+				auditory: answerCounts.Auditori,
 				kinesthetic: answerCounts.Kinestetik,
 				'visual-percentage': visualPercentage,
 				'auditory-percentage': auditoryPercentage,

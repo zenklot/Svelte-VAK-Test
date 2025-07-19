@@ -96,6 +96,8 @@
 		showResetModal = true;
 	}
 
+	import { saveResultToFirebase } from '$lib/firebaseSave'; // pastikan ini sesuai path kamu
+
 	async function lihatHasil() {
 		isLoading = true;
 
@@ -128,12 +130,6 @@
 			};
 		});
 
-		const maxScore = {
-			Visual: totalPerType.Visual * 2,
-			Auditory: totalPerType.Auditory * 2,
-			Kinestetik: totalPerType.Kinestetik * 2
-		};
-
 		const totalScore = answerCounts.Visual + answerCounts.Auditory + answerCounts.Kinestetik;
 
 		const visualPercentage = Math.round((answerCounts.Visual / totalScore) * 100);
@@ -165,7 +161,7 @@
 			}
 		};
 
-		// 🧠 Simpan ke localStorage
+		// Simpan ke localStorage
 		localStorage.setItem('vak-result', JSON.stringify(payload));
 
 		try {
@@ -176,15 +172,18 @@
 			});
 
 			if (res.ok) {
-				console.log('Berhasil disimpan');
-				goto('/result');
+				console.log('✅ Data berhasil dikirim ke API utama');
 			} else {
-				console.error('Gagal menyimpan', await res.text());
+				console.warn('⚠️ Gagal dari API utama, simpan ke Firebase sebagai fallback');
+				await saveResultToFirebase(payload);
 			}
 		} catch (err) {
-			console.error('Error:', err);
+			console.error('❌ Error saat mengirim ke API utama:', err);
+			console.log('📥 Menyimpan ke Firebase sebagai cadangan...');
+			await saveResultToFirebase(payload);
 		} finally {
 			isLoading = false;
+			goto('/result'); // Tetap redirect
 		}
 	}
 

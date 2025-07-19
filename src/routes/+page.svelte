@@ -141,7 +141,7 @@
 		</div>
 
 		<!-- Tombol -->
-		<div class="px-6 pt-2 pb-6 mt-3">
+		<div class="px-6 pt-2 pb-6 mt-3 pb-8">
 			<button
 				on:click={mulaiTes}
 				class="w-full text-lg rounded-lg bg-blue-500 px-6 py-4  text-white shadow hover:bg-blue-700"

@@ -38,7 +38,7 @@
 			biodata: {
 				name: data.name,
 				kelas: data.kelas,
-				gugus: data.gugus,
+				gugus: data.gugus
 			},
 			scores: {
 				visual: data.result['visual-percentage'],
@@ -79,14 +79,16 @@
 		<div>&nbsp;</div>
 		<div class="mx-auto flex w-full flex-col items-center justify-center gap-10 px-4">
 			<h1 class="mb-4 max-w-2xl text-2xl font-bold text-white drop-shadow-md">
-				Hasil Tes Gaya Belajar {result?.biodata?.name}, Kelas {result?.biodata?.kelas}, {result?.biodata?.gugus}
+				Hasil Tes Gaya Belajar {result?.biodata?.name}, Kelas {result?.biodata?.kelas}, {result
+					?.biodata?.gugus}
 			</h1>
 			<div class="relative w-full max-w-2xl rounded-xl bg-white p-2 shadow-xl">
 				<img
-					src={`/img/${result.dominant?.toLowerCase()}.png`}
+					src={`/img/${result.dominant?.split(',')[0].trim().toLowerCase()}.png`}
 					alt="result"
 					class="absolute top-0 left-1/2 h-24 w-24 -translate-1/2 transform rounded-full border-2 border-blue-500 bg-white drop-shadow-xl"
 				/>
+
 				<h2 class="mt-16 mb-6 text-4xl font-extrabold text-blue-600 drop-shadow-2xl">
 					{result.dominant}
 				</h2>
@@ -137,7 +139,7 @@
 		</div>
 
 		<div class="z-10 w-full max-w-2xl rounded-t-4xl bg-white px-3 py-6">
-			<div class="flex justify-between gap-2">
+			<div class="flex justify-between gap-2 pb-8">
 				<button
 					class="w-full rounded bg-blue-500 px-6 py-2 text-white hover:bg-blue-600"
 					onclick={goMain}

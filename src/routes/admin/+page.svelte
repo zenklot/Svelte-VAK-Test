@@ -32,6 +32,7 @@
 					}
 				} else if (res.status === 401) {
 					localStorage.removeItem('admin-token');
+					alert(result.message || 'Login gagal');
 				} else {
 					alert(result.message || 'Login gagal');
 				}
@@ -122,7 +123,7 @@
 
 {#if !loggedIn}
 	<!-- Login -->
-	<div class="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600">
+	<div class="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600 p-4">
 		<div class="w-full max-w-sm space-y-4 rounded-lg bg-white p-6 shadow-md">
 			<h1 class="text-center text-xl font-bold">Login Admin</h1>
 			<div>

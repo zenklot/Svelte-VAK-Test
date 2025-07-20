@@ -79,8 +79,7 @@
 		<div>&nbsp;</div>
 		<div class="mx-auto flex w-full flex-col items-center justify-center gap-10 px-4">
 			<h1 class="mb-4 max-w-2xl text-2xl font-bold text-white drop-shadow-md">
-				Hasil Tes Gaya Belajar {result?.biodata?.name}, Kelas {result?.biodata?.kelas}, {result
-					?.biodata?.gugus}
+				Hasil Tes Gaya Belajar {result?.biodata?.name}, Kelas {result?.biodata?.kelas}
 			</h1>
 			<div class="relative w-full max-w-2xl rounded-xl bg-white p-2 shadow-xl">
 				<img

@@ -4,14 +4,14 @@
 	import { goto } from '$app/navigation';
 	import questions from '$lib/questions.json';
 	import kelasList from '$lib/kelas.json';
-	import gugusList from '$lib/gugus.json';
+	// import gugusList from '$lib/gugus.json';
 	import Modal from '$lib/components/Modal.svelte';
 	import Loading from '$lib/components/Loading.svelte';
 
 	let biodata = {
 		nama: '',
 		kelas: '',
-		gugus: ''
+		gugus: 'G1'
 	};
 	let showIntro = true;
 
@@ -276,7 +276,7 @@
 					{/each}
 				</select>
 
-				<select
+				<!-- <select
 					bind:value={biodata.gugus}
 					class="mb-6 w-full rounded border bg-white px-4 py-2 text-center text-base"
 				>
@@ -284,7 +284,7 @@
 					{#each gugusList as g}
 						<option value={g.gugus}>{g.gugus}</option>
 					{/each}
-				</select>
+				</select> -->
 
 				<button
 					class="w-full rounded bg-blue-600 p-2 text-white hover:bg-blue-700 disabled:bg-gray-400"

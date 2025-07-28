@@ -1,5 +1,29 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
+	import { db } from '$lib/firebase';
+	import { collection, getDocs } from 'firebase/firestore';
+
+	async function downloadFirestoreData() {
+		try {
+			const snapshot = await getDocs(collection(db, 'results')); // ganti dengan nama koleksi kamu
+			const data = snapshot.docs.map((doc) => ({
+				id: doc.id,
+				...doc.data()
+			}));
+
+			const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+			const url = URL.createObjectURL(blob);
+
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = 'firestore-data.json';
+			a.click();
+
+			URL.revokeObjectURL(url);
+		} catch (e) {
+			console.error('Gagal mengambil data dari Firestore:', e);
+		}
+	}
 
 	let loggedIn = false;
 	let email = '';
@@ -59,7 +83,7 @@
 		if (!token) return;
 
 		try {
-			const res = await fetch('https://mock.supriatna.my.id/v5/api/answer?perPage=500', {
+			const res = await fetch('https://mock.supriatna.my.id/v5/api/answer?perPage=3000', {
 				headers: { Authorization: `Bearer ${token}` }
 			});
 			if (!res.ok) {
@@ -69,19 +93,30 @@
 
 			const result = await res.json();
 			data = result.resource || [];
-
+			ekstrakPertanyaanUnik();
 			await tick();
 
 			const table = document.getElementById('myTable');
 			if (table) {
 				const $ = globalThis.$;
-				if ($ && !$.fn.dataTable.isDataTable(table)) {
+				if ($.fn.dataTable.isDataTable(table)) {
+					$(table).DataTable().clear().destroy(); // 💥 destroy dulu
+				}
+				// if ($ && !$.fn.dataTable.isDataTable(table)) {
+				// $(table).DataTable({
+				// 	dom: 'Bfrtip',
+				// 	buttons: ['excel'],
+				// 	responsive: true
+				// });
+				setTimeout(() => {
 					$(table).DataTable({
+						scrollX: true,
 						dom: 'Bfrtip',
 						buttons: ['excel'],
 						responsive: true
 					});
-				}
+				}, 0);
+				// }
 			}
 		} catch (err) {
 			console.error(err);
@@ -106,6 +141,28 @@
 				.replace('.', ':') + ' WIB'
 		);
 	}
+
+	let pertanyaanUnik: string[] = [];
+
+	function mapJawaban(answers: any[]): Record<string, string> {
+		const m: Record<string, string> = {};
+		for (const a of answers) {
+			const key = `[${a.type?.toUpperCase()}] ${a.question}`;
+			m[key] = a.answer || '-';
+		}
+		return m;
+	}
+
+	function ekstrakPertanyaanUnik() {
+		const set = new Set<string>();
+		for (const d of data) {
+			for (const a of d.answers) {
+				const key = `[${a.type?.toUpperCase()}] ${a.question}`;
+				set.add(key);
+			}
+		}
+		pertanyaanUnik = Array.from(set).sort(); // 🔥 urutkan supaya semua row konsisten
+	}
 </script>
 
 <svelte:head>
@@ -123,7 +180,9 @@
 
 {#if !loggedIn}
 	<!-- Login -->
-	<div class="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600 p-4">
+	<div
+		class="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600 p-4"
+	>
 		<div class="w-full max-w-sm space-y-4 rounded-lg bg-white p-6 shadow-md">
 			<h1 class="text-center text-xl font-bold">Login Admin</h1>
 			<div>
@@ -156,6 +215,12 @@
 	<div class="min-h-screen bg-gray-100 p-4">
 		<div class="mb-4 flex items-center justify-between">
 			<h1 class="text-2xl font-bold">Admin Panel</h1>
+			<!-- <button
+				on:click={downloadFirestoreData}
+				class="rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700"
+			>
+				Download JSON dari Firestore
+			</button> -->
 			<button on:click={logout} class="text-sm text-red-600 underline">Logout</button>
 		</div>
 
@@ -166,27 +231,30 @@
 						<th>Tanggal</th>
 						<th>Nama</th>
 						<th>Kelas</th>
-						<th>Gugus</th>
+						<!-- <th>Gugus</th> -->
 						<th>Visual %</th>
 						<th>Auditory %</th>
 						<th>Kinesthetic %</th>
 						<th>Dominan</th>
-						<th>Jawaban</th>
+						<!-- <th>Jawaban</th> -->
+						{#each pertanyaanUnik as q}
+							<th>{q}</th>
+						{/each}
 					</tr>
 				</thead>
 				<tbody>
 					{#each data as d}
 						<tr>
 							<td>{formatTanggal(d.created_at)}</td>
-							<td>{d.name}</td>
+							<td>{d.name.toUpperCase()}</td>
 							<td>{d.kelas}</td>
-							<td>{d.gugus}</td>
+							<!-- <td>{d.gugus}</td> -->
 							<td>{d.result['visual-percentage']}%</td>
 							<td>{d.result['auditory-percentage']}%</td>
 							<td>{d.result['kinesthetic-percentage']}%</td>
 							<td class="font-bold">{d.result.dominant}</td>
-							<td>
-								<div class="text-xs space-y-1 max-h-[80px] overflow-y-auto pr-1">
+							<!-- <td>
+								<div class="max-h-[80px] space-y-1 overflow-y-auto pr-1 text-xs">
 									{#each d.answers as a}
 										<div>
 											<span class="font-medium">{a.question}</span> — <em>{a.answer}</em>
@@ -194,7 +262,20 @@
 										</div>
 									{/each}
 								</div>
-							</td>
+								
+							</td> -->
+							{#each pertanyaanUnik as q}
+								<td>{mapJawaban(d.answers)[q] || '-'}</td>
+							{/each}
+							<!-- {#each pertanyaanUnik as q}
+								<td>
+									{#if mapJawaban(d.answers)[q]}
+										{mapJawaban(d.answers)[q]}
+									{:else}
+										-
+									{/if}
+								</td>
+							{/each} -->
 						</tr>
 					{/each}
 				</tbody>
